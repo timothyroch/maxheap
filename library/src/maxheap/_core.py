@@ -13,7 +13,11 @@ __all__ = [
     "heapify",
     "heappush",
     "heappop",
-]
+    "heappushpop",
+    "heapreplace",
+    "peek",
+    "is_heap",
+    ]
 
 
 # ------------------ Internal helpers ------------------ #
@@ -94,3 +98,50 @@ def heappop(heap: List[T]) -> T:
     heap[0] = last_item
     _siftdown(heap, 0)
     return top_item
+
+
+def heappushpop(heap: List[T], item: T) -> T:
+    """Push *item* on the heap, then pop and return the largest item. O(log n).
+
+    More efficient than calling heappush() followed by heappop().
+    Semantics mirror heapq.heappushpop but for a max-heap.
+    """
+    if heap and item < heap[0]:
+        top_item = heap[0]
+        heap[0] = item
+        _siftdown(heap, 0)
+        return top_item
+    return item
+
+
+def heapreplace(heap: List[T], item: T) -> T:
+    """Pop and return the largest item, and then push *item*. O(log n).
+
+    The heap must be non-empty. Semantics mirror heapq.heapreplace but for a max-heap.
+    """
+    if not heap:
+        raise IndexError("heapreplace on empty heap")
+    top_item = heap[0]
+    heap[0] = item
+    _siftdown(heap, 0)
+    return top_item
+
+
+def peek(heap: List[T]) -> T:
+    """Return the largest element without removing it. O(1)."""
+    if not heap:
+        raise IndexError("peek from empty heap")
+    return heap[0]
+
+
+def is_heap(x: List[T]) -> bool:
+    """Return True if *x* satisfies the max-heap property (for debugging)."""
+    n = len(x)
+    for i in range(n // 2):
+        left = 2 * i + 1
+        right = left + 1
+        if left < n and x[i] < x[left]:
+            return False
+        if right < n and x[i] < x[right]:
+            return False
+    return True
