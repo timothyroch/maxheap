@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  lint-type-test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+          pip install "pytest>=8,<9" "pytest-cov>=5,<6" "hypothesis>=6,<7" "ruff>=0.12,<0.13" "mypy>=1.17,<2"
+      - name: Ruff (lint)
+        run: ruff check .
+      - name: Mypy (type)
+        run: mypy src
+      - name: Pytest (with coverage)
+        run: pytest --cov=maxheap --cov-report=xml --cov-report=term-missing
+      - name: Upload coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-${{ matrix.os }}-${{ matrix.python-version }}
+          path: coverage.xml
+
