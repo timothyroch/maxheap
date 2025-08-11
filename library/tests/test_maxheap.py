@@ -44,3 +44,14 @@ def test_peek_and_errors():
         heapq.heappop(h)
     with pytest.raises(IndexError):
         heapq.peek(h)
+
+
+def test_class_wrapper():
+    from maxheap import MaxHeap
+
+    h = MaxHeap([3, 1, 6, 5, 2, 4])
+    assert len(h) == 6
+    h.push(10)
+    assert h.peek() == 10
+    assert h.pop() == 10
+    assert heapq.is_heap(h.heap())
