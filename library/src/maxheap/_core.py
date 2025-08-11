@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import List, Protocol, TypeVar
+from typing import List, Protocol, TypeVar, Generic, Iterable, Optional
 
 class _Comparable(Protocol):
     def __lt__(self, other: "_Comparable", /) -> bool: ...
@@ -17,6 +17,7 @@ __all__ = [
     "heapreplace",
     "peek",
     "is_heap",
+    "MaxHeap",
     ]
 
 
@@ -145,3 +146,58 @@ def is_heap(x: List[T]) -> bool:
         if right < n and x[i] < x[right]:
             return False
     return True
+
+
+# ------------------ OO convenience wrapper ------------------ #
+
+
+class MaxHeap(Generic[T]):
+    """A tiny OO wrapper around the functional API.
+
+    Example:
+        >>> h = MaxHeap([3, 1, 6])
+        >>> h.push(5)
+        >>> h.pop()
+        6
+    """
+
+    __slots__ = ("_h",)
+
+    def __init__(self, iterable: Optional[Iterable[T]] = None) -> None:
+        self._h: List[T] = list(iterable) if iterable is not None else []
+        heapify(self._h)
+
+    def push(self, item: T) -> None:
+        heappush(self._h, item)
+
+    # synonyms matching functional names
+    def heappush(self, item: T) -> None:
+        self.push(item)
+
+    def pop(self) -> T:
+        return heappop(self._h)
+
+    def heappop(self) -> T:
+        return self.pop()
+
+    def peek(self) -> T:
+        return peek(self._h)
+
+    def replace(self, item: T) -> T:
+        return heapreplace(self._h, item)
+
+    def pushpop(self, item: T) -> T:
+        return heappushpop(self._h, item)
+
+    def heap(self) -> List[T]:
+        """Return the underlying list (mutations affect the heap)."""
+        return self._h
+
+    def __len__(self) -> int:  # pragma: no cover - trivial
+        return len(self._h)
+
+    def __bool__(self) -> bool:  # pragma: no cover - trivial
+        return bool(self._h)
+
+    def __repr__(self) -> str:  # pragma: no cover - trivial
+        return f"MaxHeap({self._h!r})"
