@@ -20,7 +20,7 @@ static int cmp_gt(PyObject *a, PyObject *b, int *out) {
 /* ---------- Sift helpers (in-place on list) ---------- */
 
 static int siftup(PyObject *heap, Py_ssize_t pos) {
-    if (!PyList_Check(heap)) {
+    if (!PyList_CheckExact(heap)) {
         PyErr_SetString(PyExc_TypeError, "heap must be a list");
         return -1;
     }
@@ -32,12 +32,12 @@ static int siftup(PyObject *heap, Py_ssize_t pos) {
         Py_ssize_t parent = (pos - 1) >> 1;
         PyObject *parent_item = PyList_GET_ITEM(h, parent);
 
-        int item_le_parent;
-        if (cmp_le(item, parent_item, &item_le_parent) < 0) {
+        int gt = PyObject_RichCompareBool(item, parent_item, Py_GT);
+        if (gt < 0) {
             Py_DECREF(item);
             return -1;
         }
-        if (item_le_parent) break;
+        if (!gt) break;
 
         Py_INCREF(parent_item);
         Py_DECREF(PyList_GET_ITEM(h, pos));
@@ -51,7 +51,7 @@ static int siftup(PyObject *heap, Py_ssize_t pos) {
 }
 
 static int siftdown(PyObject *heap, Py_ssize_t pos) {
-    if (!PyList_Check(heap)) {
+    if (!PyList_CheckExact(heap)) {
         PyErr_SetString(PyExc_TypeError, "heap must be a list");
         return -1;
     }
@@ -102,7 +102,7 @@ static int siftdown(PyObject *heap, Py_ssize_t pos) {
 /* ---------- API: heapify, heappush, heappop, heappushpop, heapreplace ---------- */
 
 static PyObject *api_heapify(PyObject *self, PyObject *heap) {
-    if (!PyList_Check(heap)) {
+    if (!PyList_CheckExact(heap)) {
         PyErr_SetString(PyExc_TypeError, "heapify(x): x must be a list");
         return NULL;
     }
@@ -114,10 +114,10 @@ static PyObject *api_heapify(PyObject *self, PyObject *heap) {
     Py_RETURN_NONE;
 }
 
-static PyObject *api_heappush(PyObject *self, PyObject *args) {
-    PyObject *heap, *item;
-    if (!PyArg_ParseTuple(args, "OO:heappush", &heap, &item)) return NULL;
-    if (!PyList_Check(heap)) {
+static PyObject *api_heappush(PyObject *self, PyObject *const *args, Py_ssize_t nargs) {
+    if (nargs != 2) { PyErr_SetString(PyExc_TypeError, "heappush(heap, item)"); return NULL; }
+    PyObject *heap = args[0], *item = args[1];
+    if (!PyList_CheckExact(heap)) {
         PyErr_SetString(PyExc_TypeError, "heappush(heap, item): heap must be a list");
         return NULL;
     }
@@ -128,7 +128,7 @@ static PyObject *api_heappush(PyObject *self, PyObject *args) {
 }
 
 static PyObject *api_heappop(PyObject *self, PyObject *heap) {
-    if (!PyList_Check(heap)) {
+    if (!PyList_CheckExact(heap)) {
         PyErr_SetString(PyExc_TypeError, "heappop(heap): heap must be a list");
         return NULL;
     }
@@ -161,7 +161,7 @@ static PyObject *api_heappop(PyObject *self, PyObject *heap) {
 static PyObject *api_heappushpop(PyObject *self, PyObject *args) {
     PyObject *heap, *item;
     if (!PyArg_ParseTuple(args, "OO:heappushpop", &heap, &item)) return NULL;
-    if (!PyList_Check(heap)) {
+    if (!PyList_CheckExact(heap)) {
         PyErr_SetString(PyExc_TypeError, "heappushpop(heap, item): heap must be a list");
         return NULL;
     }
@@ -188,7 +188,7 @@ static PyObject *api_heappushpop(PyObject *self, PyObject *args) {
 static PyObject *api_heapreplace(PyObject *self, PyObject *args) {
     PyObject *heap, *item;
     if (!PyArg_ParseTuple(args, "OO:heapreplace", &heap, &item)) return NULL;
-    if (!PyList_Check(heap)) {
+    if (!PyList_CheckExact(heap)) {
         PyErr_SetString(PyExc_TypeError, "heapreplace(heap, item): heap must be a list");
         return NULL;
     }
@@ -210,7 +210,7 @@ static PyObject *api_heapreplace(PyObject *self, PyObject *args) {
 
 static PyMethodDef methods[] = {
     {"heapify",     (PyCFunction)api_heapify,     METH_O,       "Transform list into a max-heap in-place."},
-    {"heappush",    (PyCFunction)api_heappush,    METH_VARARGS, "Push item onto heap (max-heap)."},
+    {"heappush",    (PyCFunction)api_heappush,    METH_FASTCALL, "Push item onto heap (max-heap)."},
     {"heappop",     (PyCFunction)api_heappop,     METH_O,       "Pop and return the largest item."},
     {"heappushpop", (PyCFunction)api_heappushpop, METH_VARARGS, "Push item then pop and return the largest."},
     {"heapreplace", (PyCFunction)api_heapreplace, METH_VARARGS, "Pop largest and then push item."},
