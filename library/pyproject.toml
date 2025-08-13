@@ -9,7 +9,6 @@ description = "A max-heap library with an API that mirrors Python's heapq (but m
 readme = "README.md"
 requires-python = ">=3.9"
 license = "MIT"  
-license-files = ["LICENSE"]
 authors = [{ name = "Timothy Roch" }]
 keywords = ["heap", "priority queue", "max-heap", "data structures"]
 classifiers = [
@@ -20,7 +19,6 @@ classifiers = [
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",  
-  "License :: OSI Approved :: MIT License",
   "Intended Audience :: Developers",
   "Topic :: Software Development :: Libraries",
   "Typing :: Typed",
@@ -34,12 +32,17 @@ Issues = "https://github.com/timothyroch/maxheap/issues"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
+license-files = ["LICENSE"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.setuptools.package-data]
 maxheap = ["py.typed"]
+
+[[tool.setuptools.ext-modules]]
+name = "maxheap._cmaxheap"
+sources = ["src/maxheap/_cmaxheap.c"]
 
 [tool.pytest.ini_options]
 addopts = "-q"
