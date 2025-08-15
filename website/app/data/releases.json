@@ -1,0 +1,32 @@
+[
+  {
+    "version": "0.1.1",
+    "date": "2025-08-13",
+    "status": "latest",
+    "highlights": [
+      "Linux wheels for CPython 3.9–3.14 (manylinux & musllinux).",
+      "C accelerator enabled by default with Python fallback.",
+      "Benchmarks: heappush ~+19%, heapify ~+28%, heapify+drain ~+41% vs heapq+negation (N=100k, repeat=10)."
+    ],
+    "files": [
+      {
+        "filename": "maxheapx-0.1.1-cp39-...-manylinux_x86_64.whl",
+        "platform": "manylinux",
+        "size": 13312
+      },
+      {
+        "filename": "maxheapx-0.1.1-cp39-...-musllinux_x86_64.whl",
+        "platform": "musllinux",
+        "size": 13312
+      }
+    ]
+  },
+  {
+    "version": "0.1.0",
+    "date": "2025-08-13",
+    "status": "yanked",
+    "highlights": [
+      "Initial release (Linux-only wheel). Superseded by 0.1.1."
+    ]
+  }
+]
