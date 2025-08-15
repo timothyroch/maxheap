@@ -1,7 +1,7 @@
 import ThemeToggle from '@/components/ThemeToggle';
 import CodeBlock from '@/components/CodeBlock';
 import VersionHistory from '@/components/VersionHistory';
-import releases from './data/releases.json';
+import releases from './data/releases';
 import Link from 'next/link';
 export default function Page() {
   const code = `import maxheap as heapq
