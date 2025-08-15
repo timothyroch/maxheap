@@ -1,7 +1,7 @@
 import ThemeToggle from '@/components/ThemeToggle';
 import CodeBlock from '@/components/CodeBlock';
-import DownloadCard, { placeholderAsset_010 } from '@/components/DownloadCard';
-import release from './data/releases.json';
+import VersionHistory from '@/components/VersionHistory';
+import releases from './data/releases.json';
 import Link from 'next/link';
 export default function Page() {
   const code = `import maxheap as heapq
@@ -67,11 +67,17 @@ print(heapq.heappop(h))  # 42`;
             </div>
 
             <div className="mt-8 grid gap-4">
-              <h2 className="text-xl font-semibold mb-4">Downloads</h2>
-              {release.assets.map((a) => (<DownloadCard asset={placeholderAsset_010} disabled />))}
-              <div className="mt-2 text-sm text-gray-500">
-                Version {release.version} · Released on August 14 2025
-              </div>
+              <VersionHistory releases={releases} />
+
+              {(() => {
+                const latest = releases[0];
+                return latest ? (
+                  <div className="mt-2 text-sm text-gray-500">
+                    Latest v{latest.version} · Released on {releases[0].date}
+                  </div>
+                ) : null;
+              })()}
+
             </div>
           </div>
 
